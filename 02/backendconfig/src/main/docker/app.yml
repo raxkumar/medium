@@ -1,0 +1,27 @@
+# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
+name: backendconfig
+services:
+  app:
+    image: backendconfig
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      - SPRING_DATA_MONGODB_URI=mongodb://backendconfig-mongodb:27017
+      - SPRING_DATA_MONGODB_DATABASE=backendconfig
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:9080/management/health
+      interval: 5s
+      timeout: 5s
+      retries: 40
+    depends_on:
+      mongodb:
+        condition: service_healthy
+  mongodb:
+    extends:
+      file: ./mongodb.yml
+      service: mongodb
